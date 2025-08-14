@@ -1,16 +1,17 @@
 // src/App.jsx
 
 import * as starshipService from "./services/starshipService/starshipService"
-// import StarshipSearch from "./components/StarshipSearch/StarshipSearch"
+import StarshipSearch from "./components/StarshipSearch/StarshipSearch"
 import StarshipList from "./components/StarshipList/StarshipList"
 import { useState, useEffect } from "react";
-import StarshipSearch from "./components/StarshipSearch/StarshipSearch";
+
 
 
 
 const App = () => {
   const [starshipsData, setStarshipsData] = useState([])
   const [displayedStarships, setDisplayedStarships] = useState([])
+ 
 
   const fetchData = async () => {
     const data = await starshipService.index();
@@ -23,27 +24,37 @@ const App = () => {
       ship.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setDisplayedStarships(filteredShips)
+   
   }
 
 
-useEffect(() => {
-  const fetchData = async () => {
-    const data = await starshipService.index()
-    setStarshipsData(data);
-    setDisplayedStarships(data);
-  }
-  fetchData();
-}, []);
+  useEffect(() => {
+    const fetchDefaultData = async () => {
+      const data = await starshipService.index()
+      setStarshipsData(data);
+      setDisplayedStarships(data);
+    }
+    fetchDefaultData();
+  }, []);
 
-return (
-  <main>
-    <h1>Starships</h1>
-    <StarshipSearch searchShips={searchShips} />
+  const totalShips = displayedStarships.length;
 
-    <StarshipList displayedStarships={displayedStarships} />
+  const resetSearch = () => {
+  setDisplayedStarships(starshipsData);
+  setPrevSearchTerm("");                
+};
 
-  </main>
-)
+  return (
+    <main>
+      <h1>Starships</h1>
+      <section>
+      <h4>Total Results: {totalShips}</h4>
+      </section>
+      <StarshipSearch searchShips={searchShips} resetSearch={resetSearch} showReset={displayedStarships.length < starshipsData.length}/>
+      <StarshipList displayedStarships={displayedStarships} />
+
+    </main>
+  )
 }
 
 export default App;
